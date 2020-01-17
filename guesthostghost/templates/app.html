@@ -1,0 +1,132 @@
+{% load staticfiles %}
+<!doctype html>
+<html>
+  <head>
+
+      <div style="border: 1px solid black">
+    <title>[guest] HOST [ghost]</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}"/>
+  </head>
+  <body style="background-color:whitesmoke;"></body>
+  
+</div>
+    {% include 'nav.html' %}
+    
+    
+
+    <div style="background-color:whitesmoke;color:DodgerBlue;padding:20px;">
+        <h2 class="jumbotron-heading text-xs-center" style= "font-family:monospace">👩‍💻<b><sub><small>[guest]</small></sub> HOST <sup>[ghost]</sup>👩‍💻</b></b></h2>
+        <img src="../static/img/bot face.gif" style="width:320px;height:180px;"/>
+        <p class="lead text-xs-left">
+         <p style="text-align:center;" title="Chat with me!"> <span style="border: 1px solid black">💬 online  </span><br> @NDSM Amsterdam ❌❌❌ </p>
+        <a href="https://swaenynina.com/"><em>source</em></a>
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+</head>
+<body>
+
+
+
+        <div class="row">
+          
+            <ul class="list-group chat-log js-chat-log">
+            </ul>
+
+            <div class="input-group input-group-lg mt-1">
+              <input type="text" class="form-control js-text" placeholder="Type something..."/>
+              <span class="input-group-btn">
+                <button class="btn btn-primary js-say">Send</button>
+              </span>
+            </div>
+            
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/js.cookie.js' %}"></script>
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+    <script>
+      var chatterbotUrl = '{% url "chatterbot" %}';
+      var csrftoken = Cookies.get('csrftoken');
+
+      function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+      }
+
+      $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+        }
+      });
+
+      var $chatlog = $('.js-chat-log');
+      var $input = $('.js-text');
+      var $sayButton = $('.js-say');
+
+      function createRow(text) {
+        var $row = $('<li class="list-group-item"></li>');
+
+        $row.text(text);
+        $chatlog.append($row);
+      }
+
+      function submitInput() {
+        var inputData = {
+          'text': $input.val()
+        }
+
+        // Display the user's input on the web page
+        createRow(inputData.text);
+
+        var $submit = $.ajax({
+          type: 'POST',
+          url: chatterbotUrl,
+          data: JSON.stringify(inputData),
+          contentType: 'application/json'
+        });
+
+        $submit.done(function(statement) {
+            createRow(statement.text);
+
+            // Clear the input field
+            $input.val('');
+
+            // Scroll to the bottom of the chat interface
+            $chatlog[0].scrollTop = $chatlog[0].scrollHeight;
+        });
+
+        $submit.fail(function() {
+          // TODO: Handle errors
+        });
+      }
+
+      $sayButton.click(function() {
+        submitInput();
+      });
+
+      $input.keydown(function(event) {
+        // Submit the input when the enter button is pressed
+        if (event.keyCode == 13) {
+          submitInput();
+        }
+      });
+    </script>
+
+<img src="../static/img/text me.gif" style="width:250px;height:210px;">
+  </body>
+</html>
